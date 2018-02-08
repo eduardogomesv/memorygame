@@ -1,0 +1,6 @@
+.cards-container {min-height: 200px;}
+
+header, section, footer {overflow: auto; margin: 0; padding: 0;}
+
+.card img {transition: .3s all; opacity: 0; transform: scaleX(0);}
+.card.shown img, .card[data-solved="true"] img {opacity: 1 !important;transform: scaleX(1);}
