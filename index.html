@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Jogo da memória</title>
+
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+	<link rel="stylesheet" href="style.css">
+
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+</head>
+<body>
+	<header class="navbar bg-dark text-light mb-3">
+		<h1 class="navbar-brand text-center mx-auto">Memory Game</h1>
+	</header>
+	<footer class="navbar fixed-bottom">
+		<h1 class="navbar-brand ml-auto">YCloud</h1>
+	</footer>
+
+	<section class="container">
+		<div class="row">
+			<div class="col-md-8">
+				<div class="row cards-container">
+					<div class="col"><h3 class="m-3">Aguardando lista de cartas</h3></div>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<h4 class="card p-2 bg-primary text-light">
+					<small class="text-uppercase d-block mb-2">Tentativas</small>
+					<b class="tentativas_count">0</b>
+				</h4>
+				<h4 class="card p-2 bg-success text-light">
+					<small class="text-uppercase d-block mb-2">Acertos</small>
+					<b class="acertos_count">0</b>
+				</h4>
+				<h4 class="card p-2 bg-danger text-light">
+					<small class="text-uppercase d-block mb-2">Erros</small>
+					<b class="erros_count">0</b>
+				</h4>
+			</div>
+		</div>
+	</section>
+
+	<script>
+		function shuffle(arra1) { var ctr = arra1.length, temp, index; while (ctr > 0) { index = Math.floor(Math.random() * ctr); ctr--; temp = arra1[ctr]; arra1[ctr] = arra1[index]; arra1[index] = temp; } return arra1; }
+		var cards = [{"id": "c1", "url": "img/card1.jpg"}, {"id": "c2", "url": "img/card2.jpg"}, {"id": "c3", "url": "img/card3.jpg"}, {"id": "c4", "url": "img/card4.jpg"}, {"id": "c5", "url": "img/card5.jpg"}, {"id": "c6", "url": "img/card6.jpg"}];
+		var copy_cards = cards; cards = cards.concat(copy_cards);
+
+		jQuery(document).ready(function($) {
+			$(".cards-container").html("");
+			$.each(shuffle(cards), function(index, card) {
+				$(".cards-container").append('<div class="col-3"><div class="card m-2 yc-card" data-status="hide" data-par="'+card.id+'" style="overflow:hidden;"><div class="card-bodyd"><img src="'+card.url+'" class="d-block w-100"></div></div></div>');
+			});
+
+			var tentativas = 0;
+			var acertos = 0;
+			var erros = 0;
+
+			var $old_par = null
+			var closed = true;
+			$(".cards-container .card").click(function(event) {
+				var $carta = $(this);
+				var $par = $carta.data("par");
+				var $status = $carta.data("status");
+				var $shown = $(".shown");
+				var $pares = $("[data-par='"+$par+"']");
+
+				if($status === "hide" && closed) {
+					closed = false;
+					console.log($par, $status);
+					// $shown.data("status", "hide").removeClass("shown");
+					$carta.data("status", "shown").addClass("shown");
+
+					if($old_par != null && $old_par == $par){
+						console.log("match");
+						$pares.attr("data-solved", true);
+						$old_par = null;
+						acertos++;
+						closed = true;
+					} else if($old_par != null && $old_par != $par) {
+						console.log("try again");
+						setTimeout(function() {
+							$shown.data("status", "hide").removeClass("shown");
+							$carta.data("status", "hide").removeClass("shown");
+							$old_par = null;
+							closed = true;
+						}, 1000);
+						erros++;
+					} else {
+						$old_par = $par;
+						tentativas++;
+						closed = true;
+					}
+				}
+
+				$(".tentativas_count").text(tentativas);
+				$(".acertos_count").text(acertos);
+				$(".erros_count").text(erros);
+			});
+		});
+	</script>
+</body>
+</html>
